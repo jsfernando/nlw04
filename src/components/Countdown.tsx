@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react'; // useEffect é um hook
 import styles from '../styles/components/Countdown.module.css';
 
-export function Countdown() {
-    const [time, setTime] = useState(25 * 60);
-    const [active, setActive] = useState(false);
+let countdownTimeout: NodeJS.Timeout;
 
+export function Countdown() {
+    const [time, setTime] = useState(0.1 * 60);
+    const [isActive, setIsActive] = useState(false);
+    const [hasFinished, setHasFinished] =  useState(false);
     const minutes =  Math.floor(time/60); // floor arredonda pra baixo
     const seconds = time % 60;
 
+    // convertendo minutos para string e o padStar pega a segunda parte do número '2' '5', se for '0' '5' e o split volta um array
+    // const [ m...left, m...right] é uma desconstrução do javascript
     const [minuteLeft, minuteRight] = String(minutes).padStart(2, '0').split('');
     const [secondLeft, secondRight] = String(seconds).padStart(2, '0').split('');
 
     function startCountdown(){
-        setActive(true); //mudando o estado quando o botão for clicado
+        setIsActive(true); //mudando o estado quando o botão for clicado
+    }
+    function resetCountdown(){
+        clearTimeout(countdownTimeout); //cancelando a execução de um timeout
+        setIsActive(false);
+        setTime(0.1*60);
     }
 
     // Os hooks(funcao) serve para disparar/executar efeitos colaterais 
@@ -21,12 +30,15 @@ export function Countdown() {
     // 1- o que Eu quero executar e sempre será um função arrow function
     // 2- quando que Eu quero executar
     useEffect( ()=> {
-        if(active && time > 0){
-            setTimeout( ()=> {
+        if(isActive && time > 0){
+            countdownTimeout = setTimeout( ()=> {
                 setTime(time -1);
             }, 1000)
+        } else if (isActive && time == 0) {
+            setHasFinished(true);
+            setIsActive(false);
         }
-    }, [active, time]) // quero executar uma função ...sempre que o valor de active mudar...
+    }, [isActive, time]) // quero executar uma função ...sempre que o valor de isActive mudar...
 
     return (
         <div>
@@ -41,12 +53,50 @@ export function Countdown() {
                     <span>{secondRight}</span>
                 </div>
             </div>
-            <button 
+
+            
+            {/* // if ternário somente com o then, sem o else
+            { hasFinished && ( 
+                console.log("terminou...")
+                )} 
+            */}
+
+            { hasFinished ? ( 
+                <button 
+                disabled
                 type="button" 
                 className={styles.countdownButton}
-                onClick={startCountdown}>
-                Iniciar um ciclo
-            </button>
+                >
+                Ciclo encerrado 
+                </button>
+
+                ) : (
+                    <>
+                    { isActive ? (
+                        <button 
+                            type="button" 
+                            className={`${styles.countdownButton} ${styles.countdownButtonActive}`}
+                            onClick={resetCountdown}
+                        >
+                            Abandonar ciclo
+                        </button>
+                    ) : (
+                        <button 
+                        type="button" 
+                        className={styles.countdownButton}
+                        onClick={startCountdown}
+                        >
+                            Iniciar ciclo
+                        </button>
+                    ) }
+                    </>
+                )
+
+            }
+
+
+
+
         </div>
     )
 }
