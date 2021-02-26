@@ -6,14 +6,14 @@ export function ChallengeBox() {
     return (
         <div className={styles.challengeBoxContainer}>
             { hasActiveChallenge ? (
-                <div className={styles.challengeAcative}>
+                <div className={styles.challengeActive}>
                     <header>
                         Ganhe 400 xp
                     </header>
                     <main>
                         <img src="icons/body.svg" alt=""/>
                         <strong>Novo desafio</strong>
-                        <p>Levante e faça uma caminhada de 3 minutors.</p>
+                        <p>Levante e faça uma caminhada de 3 minutos.</p>
                     </main>
                     <footer>
                         <button 
@@ -24,7 +24,7 @@ export function ChallengeBox() {
                         </button>
                         <button 
                         type="button"
-                        className={styles.challengeSucceededButton}
+                        className={styles.challengeSucceededButtom}
                         >
                             Completei
                         </button>
