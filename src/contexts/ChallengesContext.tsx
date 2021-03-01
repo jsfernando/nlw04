@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from 'react';
+import { createContext, useState, ReactNode, useCallback } from 'react';
 
 // desafios importados arquivo json
 import challenges from '../../challenges.json';
@@ -13,10 +13,12 @@ interface Challenge {
 interface ChallengesContextData {   
     level: number;
     currentExperience: number;
+    experienceToNextLevel: number;
     challengesCompleted: number;
     activeChallenge: Challenge;
     levelUp: () => void;
     startNewChallenge: () => void; 
+    resetChallenge: () => void; 
     
 }
 interface ChallengesProviderProps{
@@ -27,11 +29,16 @@ export const ChallengesContext = createContext({} as ChallengesContextData);
 
 export function ChallengesProvider({ children }: ChallengesProviderProps ){
     const [level, setLevel] = useState(1);
-    const [currentExperience, setCurrentExperience] = useState(0);
+    const [currentExperience, setCurrentExperience] = useState(30);
     const [challengesCompleted, setChallengesCompleted] = useState(0);
 
     // estado do desafio (challenge)
     const [activeChallenge, setActiveChallenge] = useState(null)
+
+    // pow calculo de potencia.
+    // 4 e o fator de experiencia, mude esse valor se voce quiser deixar mais facil ou dificil
+    const experienceToNextLevel = Math.pow((level + 1) * 4, 2);
+
 
     function levelUp() {
         setLevel(level + 1);
@@ -48,15 +55,22 @@ export function ChallengesProvider({ children }: ChallengesProviderProps ){
         setActiveChallenge(challenge)
     }
 
+    const resetChallenge = useCallback(() => {
+        setActiveChallenge(null);
+      }, []);
+    
+
     return(
         <ChallengesContext.Provider 
             value={{ 
                 level, 
                 currentExperience, 
+                experienceToNextLevel,
                 challengesCompleted, 
                 activeChallenge,
                 levelUp,
-                startNewChallenge 
+                startNewChallenge,
+                resetChallenge 
                 }}
         >
             {children}
